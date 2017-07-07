@@ -25,7 +25,7 @@ You will need to have numpy and scipy installed on your current system.
 You can install precision lasso using pip by doing the following
 
 ```
-   pip install git+https://github.com/nickFurlotte/pylmm
+   pip install git+https://github.com/HaohanWang/thePrecisionLasso
 ```
 This should make the module pylmm available as well as the two scripts pylmmGWAS.py and pylmmKinship.py.
 
