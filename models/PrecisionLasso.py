@@ -64,7 +64,7 @@ class PrecisionLasso():
             cf = it
             if norm(w - w_old) < self.eps:
                 break
-        w[w<mu[cf]] = 0
+        w[w<=mu[cf]] = 0
         self.w = w
         return cf
 
@@ -88,3 +88,4 @@ class PrecisionLasso():
         r = testRepresentability(X)
         linearDepend = len(np.where(r>0)[0])
         self.gamma = (float(correlation)/(correlation+linearDepend))
+        print 'Model set Gamma automatically as:', self.gamma

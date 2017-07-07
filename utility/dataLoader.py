@@ -4,6 +4,13 @@ import sys
 import numpy as np
 import pysnptools
 
+def famReader(fileName):
+    d = []
+    text = [line.strip() for line in open(fileName)]
+    for line in text:
+        d.append(float(line.split()[-1]))
+    return np.array(d)
+
 class FileReader():
     def __init__(self, fileType, fileName):
         self.fileType = fileType
@@ -17,10 +24,11 @@ class FileReader():
             X = snpdata.val
             Xname = snpdata.sid
 
-            from pysnptools.snpreader import Pheno
-            phenoreader = Pheno(self.fileName+".fam")
-            phenodata = phenoreader.read()
-            y = phenodata.val[:,-1]
+            # from pysnptools.snpreader import Pheno
+            # phenoreader = Pheno(self.fileName+".fam")
+            # phenodata = phenoreader.read()
+            # y = phenodata.val[:,-1]
+            y = famReader(self.fileName+".fam")
             return X, y, Xname
 
         if self.fileType == 'csv':

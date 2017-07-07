@@ -71,12 +71,12 @@ print Y.shape
 
 model, implementation = modelDict[options.model]
 if implementation == 1:
-    model.setLearningRate(options.lr)
-model.setLambda(options.lmbd)
+    model.setLearningRate(float(options.lr))
+model.setLambda(float(options.lmbd))
 
 if options.model == 'pl':
     if options.gamma is not None:
-        model.setGamma(options.gamma)
+        model.setGamma(float(options.gamma))
     else:
         model.calculateGamma(X)
 
@@ -84,9 +84,10 @@ if options.snum is None:
     model.fit(X, Y)
     beta = model.getBeta()
 else:
+    snum = int(options.snum)
     betaM = None
-    min_lambda = 1e-15
-    max_lambda = 1e15
+    min_lambda = 1e-30
+    max_lambda = 1e30
     patience = 50
 
     iteration = 0
@@ -94,7 +95,7 @@ else:
     while min_lambda < max_lambda and iteration < patience:
         iteration += 1
         lmbd = np.exp((np.log(min_lambda) + np.log(max_lambda)) / 2.0)
-        # print "Iter:{}\tlambda:{}".format(iteration, lmbd)
+        print "Iter:{}\tlambda:{}".format(iteration, lmbd)
         model.setLambda(lmbd)
         if implementation == 1:
             model.setLearningRate(options.lr)  # learning rate must be set again every time we run it.
@@ -102,10 +103,10 @@ else:
         beta = model.getBeta()
 
         c = len(np.where(np.abs(beta) > 0)[0])  # we choose regularizers based on the number of non-zeros it reports
-        # print "# Chosen:{}".format(c)
-        if c < options.snum:  # Regularizer too strong
+        print "# Chosen:{}".format(c)
+        if c < snum:  # Regularizer too strong
             max_lambda = lmbd
-        elif c > options.snum:  # Regularizer too weak
+        elif c > snum:  # Regularizer too weak
             min_lambda = lmbd
             betaM = beta
         else:
@@ -127,6 +128,6 @@ out = open(outFile, 'w')
 printOutHead()
 
 for i in range(len(bn)):
-    outputResult(i, bn[i][1], bn[i][0])
+    outputResult(i+1, bn[i][1], bn[i][0])
 
 out.close()
