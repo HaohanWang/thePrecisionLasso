@@ -14,9 +14,8 @@ def outputResult(rank, id, beta):
 
 from optparse import OptionParser, OptionGroup
 
-usage = """usage: %prog [options] --[tfile | bfile | gcsv] genotypeFile --[pfile | pcsv ] phenotypeFile  outfileBase
+usage = """usage: %prog [options] -t fileType(plink/csv) -n fileName
 This program provides the basic usage to precision lasso
-      python runPL.py -v --bfile plinkFile --phenofile plinkFormattedPhenotypeFile resultFile
 	    """
 parser = OptionParser(usage=usage)
 
@@ -25,39 +24,22 @@ modelGroup = OptionGroup(parser, "Model Options")
 advancedGroup = OptionGroup(parser, "Advanced Parameter Options")
 
 ## data options
-
-dataGroup.add_option("--pfile", dest="pfile",
-                 help="The base for a PLINK ped file")
-dataGroup.add_option("--tfile", dest="tfile",
-                      help="The base for a PLINK tped file")
-dataGroup.add_option("--bfile", dest="bfile",
-                      help="The base for a PLINK binary bed file")
-dataGroup.add_option("--phenofile", dest="phenoFile",
-                      help="The plink phenotype file")
-dataGroup.add_option("--gcsv", dest="gCSVFile",
-                      help="genomic variables in CSV data format, each row is one sample, each column is one variable")
-dataGroup.add_option("--gname", dest="gNameFile",
-                     help="name of the corresponding genomic variables, if none given, index will be used.")
-dataGroup.add_option("--pcsv", dest="pCSVFile",
-                      help="phenotypes in CSV data format, each row is one sample, each column is one phenotype")
-dataGroup.add_option("--pname", dest="pNameFile",
-                     help="name of the corresponding phenotypes, if none given, index will be used.")
+dataGroup.add_option("-t", dest='fileType', default='plink', help="choices of input file type")
+dataGroup.add_option("-n", dest='fileName', help="name of the input file")
 
 ## model options
 modelGroup.add_option("--model", dest="model", default="pl",
                       help="choices of the model used, if None given, the Precision Lasso will be run. ")
-modelGroup.add_option("--lambda", dest="lmbd",default=1,
-                 help="the weight of the penalizer, either lambda or snum must be given.")
-modelGroup.add_option("--snum", dest="snum",default=None,
-                 help="the number of targeted variables the model selects, either lambda or snum must be given.")
+modelGroup.add_option("--lambda", dest="lmbd", default=1,
+                      help="the weight of the penalizer, either lambda or snum must be given.")
+modelGroup.add_option("--snum", dest="snum", default=None,
+                      help="the number of targeted variables the model selects, either lambda or snum must be given.")
 
 ## advanced options
-advancedGroup.add_option("--gamma", dest="gamma",default=None,
-                 help="gamma parameter of the Precision Lasso, if none given, the Precision Lasso will calculate it automatically")
-advancedGroup.add_option("--lr", dest="lr",default=1,
-                 help="learning rate of some of the models")
-
-
+advancedGroup.add_option("--gamma", dest="gamma", default=None,
+                         help="gamma parameter of the Precision Lasso, if none given, the Precision Lasso will calculate it automatically")
+advancedGroup.add_option("--lr", dest="lr", default=1,
+                         help="learning rate of some of the models")
 parser.add_option_group(dataGroup)
 parser.add_option_group(modelGroup)
 parser.add_option_group(advancedGroup)
@@ -68,61 +50,24 @@ import sys
 import os
 import numpy as np
 from scipy import linalg
-from utility.dataLoader import plink, CSVReader
+from utility.dataLoader import FileReader
 from utility.modelsImport import modelDict
 
 fileType = 0
 IN = None
-X = None
-Y = None
 
-if len(args) != 1:
+if len(args) != 0:
     parser.print_help()
     sys.exit()
 
-outFile = args[0]
+outFile = options.fileName + '.output'
 
-if not options.tfile and not options.bfile and not options.gCSVFile:
-    # if not options.pfile and not options.tfile and not options.bfile:
-    parser.error(
-        "You must provide at least one PLINK input file base (--tfile or --bfile) or an CSV formatted file (--gcsv).")
+reader = FileReader(options.fileType, options.fileName)
+X, Y, Xname = reader.readFiles()
 
-# READING PLINK input
-if options.verbose: sys.stderr.write("Reading SNP input...\n")
-if options.bfile:
-    IN = plink(options.bfile, type='b', phenoFile=options.phenoFile, normGenotype=options.normalizeGenotype)
-    fileType = 1
-elif options.tfile:
-    IN = plink(options.tfile, type='t', phenoFile=options.phenoFile, normGenotype=options.normalizeGenotype)
-    fileType = 1
-elif options.gCSVFile:
-    IN = CSVReader(gCSVFile=options.gCSVFile, gName=options.gNameFile, pCSVFile=options.pCSVFile, pName=options.pNameFile)
-    fileType = 2
-else:
-    parser.error("You must provide at least one genotype file")
+print X.shape
+print Y.shape
 
-if options.pfile:
-    IN = plink(options.pfile,type='p', phenoFile=options.phenoFile,normGenotype=options.normalizeGenotype)
-    fileType = 1
-elif options.pCSVFile:
-    IN = CSVReader(gCSVFile=options.gCSVFile, gName=options.gNameFile, pCSVFile=options.pCSVFile, pName=options.pNameFile)
-    fileType = 2
-else:
-    parser.error("You must provide at least one phenotype file")
-
-if fileType == 1:
-    X = []
-    Xname = []
-    for snp, id in IN:
-        X.append(snp)
-        Xname.append(id)
-    Y = IN.getPhenos(options.phenoFile)
-elif fileType == 2:
-    X, Xname = IN.getGenotype()
-    Y = IN.getPhenotype()
-else:
-    sys.stderr.write("Input files missing")
-    Xname = None
 
 model, implementation = modelDict[options.model]
 if implementation == 1:
@@ -148,19 +93,19 @@ else:
 
     while min_lambda < max_lambda and iteration < patience:
         iteration += 1
-        lmbd = np.exp((np.log(min_lambda)+np.log(max_lambda)) / 2.0)
+        lmbd = np.exp((np.log(min_lambda) + np.log(max_lambda)) / 2.0)
         # print "Iter:{}\tlambda:{}".format(iteration, lmbd)
         model.setLambda(lmbd)
         if implementation == 1:
-            model.setLearningRate(options.lr) # learning rate must be set again every time we run it.
+            model.setLearningRate(options.lr)  # learning rate must be set again every time we run it.
         model.fit(X, Y)
         beta = model.getBeta()
 
-        c = len(np.where(np.abs(beta)>0)[0]) # we choose regularizers based on the number of non-zeros it reports
+        c = len(np.where(np.abs(beta) > 0)[0])  # we choose regularizers based on the number of non-zeros it reports
         # print "# Chosen:{}".format(c)
-        if c < options.snum:   # Regularizer too strong
+        if c < options.snum:  # Regularizer too strong
             max_lambda = lmbd
-        elif c > options.snum: # Regularizer too weak
+        elif c > options.snum:  # Regularizer too weak
             min_lambda = lmbd
             betaM = beta
         else:
@@ -168,7 +113,7 @@ else:
             break
     beta = betaM
 
-ind = np.where(beta!=0)[0]
+ind = np.where(beta != 0)[0]
 bs = beta[ind].tolist()
 xname = []
 for i in ind:
@@ -178,7 +123,7 @@ beta_name = zip(beta, Xname)
 bn = sorted(beta_name)
 bn.reverse()
 
-out = open(outFile,'w')
+out = open(outFile, 'w')
 printOutHead()
 
 for i in range(len(bn)):
