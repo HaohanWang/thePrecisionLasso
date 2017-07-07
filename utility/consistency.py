@@ -1,10 +1,6 @@
 __author__ = 'Haohan Wang'
 
-import sys
-
-sys.path.append('../')
-
-from utility.loadData import *
+import numpy as np
 
 def testRepresentability(data):
     l = []
@@ -28,15 +24,3 @@ def calculateGammaAll(X, rate=0.99):
     r = testRepresentability(X)
     linearDepend = len(np.where(r>0)[0])
     return correlation, linearDepend, (float(correlation)/(correlation+linearDepend)), correlation/float(X.shape[1]), linearDepend/float(X.shape[1])
-
-
-if __name__ == '__main__':
-    print
-    for name in ['breast', 'colon', 'glio', 'kidney', 'lung']:
-        data, ks = loadExpressionData(name)
-        index = ['ge/', 'methy/', 'mirna/']
-        count = 0
-        for (X, Y, w) in data:
-            c, l, g, fc, fl = calculateGammaAll(X)
-            print 'Gamma', index[count], name, c, l, g, fc, fl
-            count += 1
