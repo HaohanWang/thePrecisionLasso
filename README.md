@@ -17,7 +17,7 @@ the Precision Lasso is a Lasso variant that is showed to work better compared to
 ## An Example Command:
 
 ```
-python runPL.py -v --bfile data/snps.132k.clean.noX --phenofile data/snps.132k.clean.noX.fake.phenos out.txt
+python runPL.py -t csv -n data/toy
 ```
 
 ## Installation

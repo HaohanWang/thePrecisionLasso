@@ -15,7 +15,8 @@ def outputResult(rank, id, beta):
 from optparse import OptionParser, OptionGroup
 
 usage = """usage: %prog [options] -t fileType(plink/csv) -n fileName
-This program provides the basic usage to precision lasso
+This program provides the basic usage to precision lasso, e.g:
+python runPL.py -t csv -n data/toy
 	    """
 parser = OptionParser(usage=usage)
 
