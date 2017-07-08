@@ -19,6 +19,9 @@ the Precision Lasso is a Lasso variant that is showed to work better compared to
 ```
 python runPL.py -t csv -n data/toy
 ```
+#### Data Support
+* Precision Lasso currently supports CSV and binary PLINK files. 
+* Extensions to other data format can be easily implemented through `FileReader` in `utility/dataLoadear`. Feel free to contact us for the support of other data format. 
 
 ## Installation
 You will need to have numpy and scipy installed on your current system.
@@ -34,3 +37,6 @@ You can also clone the repository and do a manual install.
    git clone https://github.com/HaohanWang/thePrecisionLasso
    python setup.py install
 ```
+
+## Contact
+[Haohan Wang](http://www.cs.cmu.edu/~haohanw/)
