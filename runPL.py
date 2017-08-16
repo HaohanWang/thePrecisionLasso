@@ -41,6 +41,7 @@ advancedGroup.add_option("--gamma", dest="gamma", default=None,
                          help="gamma parameter of the Precision Lasso, if none given, the Precision Lasso will calculate it automatically")
 advancedGroup.add_option("--lr", dest="lr", default=1,
                          help="learning rate of some of the models")
+modelGroup.add_option('-m', action='store_true', dest='missing', default=False, help='Run without missing genotype imputation')
 parser.add_option_group(dataGroup)
 parser.add_option_group(modelGroup)
 parser.add_option_group(advancedGroup)
@@ -63,11 +64,8 @@ if len(args) != 0:
 
 outFile = options.fileName + '.output'
 
-reader = FileReader(options.fileType, options.fileName)
+reader = FileReader(fileName=options.fileName, fileType=options.fileType, imputation=(not options.missing))
 X, Y, Xname = reader.readFiles()
-
-print X.shape
-print Y.shape
 
 
 model, implementation = modelDict[options.model]
