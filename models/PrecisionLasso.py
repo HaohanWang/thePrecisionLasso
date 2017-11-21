@@ -148,7 +148,7 @@ class PrecisionLasso():
 if __name__ == '__main__':
     np.random.seed(1)
     X = np.random.random([100, 1000])
-    y = np.random.random([100, 1])
+    y = np.random.random([100])
     model = PrecisionLasso()
     model.setLogisticFlag(False)
     model.setLambda(1)
