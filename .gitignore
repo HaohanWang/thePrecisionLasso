@@ -3,3 +3,4 @@
 test/*
 plink/* 
 *.output
+.ipynb_checkpoints/*
