@@ -11,6 +11,16 @@ def printOutHead(): out.write("\t".join(["RANK", "SNP_ID", "BETA_ABS"]) + "\n")
 def outputResult(rank, id, beta):
     out.write("\t".join([str(x) for x in [rank, id, beta]]) + "\n")
 
+def KFold(X,y,k=5):
+    foldsize = int(X.shape[0]/k)
+    for idx in range(k):
+        testlst = range(idx*foldsize,idx*foldsize+foldsize)
+        Xtrain = np.delete(X,testlst,0)
+        ytrain = np.delete(y,testlst,0)
+        Xtest = X[testlst]
+        ytest = y[testlst]
+        yield Xtrain, ytrain, Xtest, ytest
+
 
 from optparse import OptionParser, OptionGroup
 
@@ -31,7 +41,7 @@ dataGroup.add_option("-n", dest='fileName', help="name of the input file")
 ## model options
 modelGroup.add_option("--model", dest="model", default="pl",
                       help="choices of the model used, if None given, the Precision Lasso will be run. ")
-modelGroup.add_option("--lambda", dest="lmbd", default=1,
+modelGroup.add_option("--lambda", dest="lmbd", default=None,
                       help="the weight of the penalizer, either lambda or snum must be given.")
 modelGroup.add_option("--snum", dest="snum", default=None,
                       help="the number of targeted variables the model selects, either lambda or snum must be given.")
@@ -42,6 +52,7 @@ advancedGroup.add_option("--gamma", dest="gamma", default=None,
 advancedGroup.add_option("--lr", dest="lr", default=1,
                          help="learning rate of some of the models")
 modelGroup.add_option('-m', action='store_true', dest='missing', default=False, help='Run without missing genotype imputation')
+modelGroup.add_option('-b', action='store_true', dest='logisticFlag', default=False, help='Enable the logistic regression version of Precision Lasso')
 parser.add_option_group(dataGroup)
 parser.add_option_group(modelGroup)
 parser.add_option_group(advancedGroup)
@@ -71,7 +82,7 @@ X, Y, Xname = reader.readFiles()
 model, implementation = modelDict[options.model]
 if implementation == 1:
     model.setLearningRate(float(options.lr))
-model.setLambda(float(options.lmbd))
+model.setLogisticFlag(options.logisticFlag)
 
 if options.model == 'pl':
     if options.gamma is not None:
@@ -79,10 +90,26 @@ if options.model == 'pl':
     else:
         model.calculateGamma(X)
 
-if options.snum is None:
+if options.snum is None and options.lmbd is None:
+    min_mse = np.inf
+    min_lam = 0
+    for i in range(11):
+        lam = 10**(i-5)
+        model.setLambda(lam)
+        model.setLearningRate(options.lr)
+        mse = 0
+        for Xtrain, ytrain, Xtest, ytest in KFold(X, Y, 5):
+            model.fit(Xtrain, ytrain)
+            pred = model.predict(Xtest)
+            mse += np.linalg.norm(pred - ytest)
+        if mse < min_mse:
+            min_mse = mse
+            min_lam = lam
+    model.setLambda(min_lam)
     model.fit(X, Y)
     beta = model.getBeta()
-else:
+
+elif options.lmbd is None:
     snum = int(options.snum)
     betaM = None
     min_lambda = 1e-30
@@ -112,6 +139,10 @@ else:
             betaM = beta
             break
     beta = betaM
+else:
+    model.setLambda(float(options.lmbd))
+    model.fit(X, Y)
+    beta = model.getBeta()
 
 ind = np.where(beta != 0)[0]
 bs = beta[ind].tolist()
