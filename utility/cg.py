@@ -39,43 +39,35 @@ def logisticRegressionSolverCost(t):
 def logisticGradient(X, D, Xi, diff):
     return -np.dot(X.transpose(), diff) - np.multiply(D, np.dot(diff, Xi.T))
 
-def stopCheck(prev, new, pg, X, y):
-    if np.linalg.norm(y - np.dot(X, new)) <= \
-                            np.linalg.norm(y - np.dot(X, new)) + np.sum(np.dot(pg.transpose(), (new - prev))):
-        return False
-    else:
-        return True
-
-def logisticRegressionGradientSolver(w, X, y, D, lr, tol, maxIter):
+def logisticRegressionGradientSolver(w, X, y, D, lr, tol, maxIter, quiet=True):
     resi_prev = np.inf
-    tmp = 1/(1+np.exp(-np.dot(X, w)))
-
+    xw = np.dot(X, w).T
+    # xw = np.minimum(xw, 500)
+    tmp = 1/(1+np.exp(xw))
     xi = np.dot(X.T, np.linalg.pinv(np.dot(X, X.T)))
 
     Dxw = np.dot(np.multiply(D, w), xi)
+    costy = -(y*xw - tmp) - Dxw
     diff = y - tmp - Dxw
-    resi = logisticRegressionSolverCost(diff)
+    resi = logisticRegressionSolverCost(costy)
 
     step = 0
     while resi_prev - resi > tol and step < maxIter:
-        keepRunning = True
         resi_prev = resi
-        runningStep = 0
-        while keepRunning and runningStep < 10:
-            runningStep += 1
-            prev_w = w
-            grad = logisticGradient(X, D, xi, diff)
-            w = w - grad * lr
-            tmp = 1/(1+np.exp(-np.dot(X, w)))
-            Dxw = np.dot(np.multiply(D, w), xi)
-            diff = y - tmp - Dxw
-            keepRunning = stopCheck(prev_w, w, grad, X, y)
-            # keepRunning = False
-            if keepRunning:
-                lr = 0.5 * lr
+        if not quiet:
+            print resi_prev
+
+        grad = logisticGradient(X, D, xi, diff)
+        w = w - grad * lr
+        xw = np.dot(X, w).T
+        # xw = np.minimum(xw, 500)
+        tmp = 1/(1+np.exp(xw))
+        Dxw = np.dot(np.multiply(D, w), xi)
+        costy = -(y*xw - tmp) - Dxw
+        diff = y - tmp - Dxw
 
         step += 1
-        resi = logisticRegressionSolverCost(diff)
-        if resi > resi_prev:
+        resi = logisticRegressionSolverCost(costy)
+        if resi >= resi_prev:
             return w
     return w

@@ -4,7 +4,7 @@ import numpy as np
 from utility.cg import solve_cg, A_trace, norm, logisticRegressionGradientSolver
 
 class PrecisionLasso():
-    def __init__(self, lmbd=1., eps=10**(-6), P=None, maxIter=100, gamma=0.5, lr=1., tol=1e-5, mu=1e-2, logistic=False):
+    def __init__(self, lmbd=1., eps=10**(-6), P=None, maxIter=100, gamma=0.5, lr=1e-6, tol=1e-5, mu=1e-2, logistic=False):
         self.lmbd = lmbd
         self.P = P
         self.eps = eps
@@ -71,8 +71,7 @@ class PrecisionLasso():
 
             w_old = w
             if self.logistic:
-                # w = logisticRegressionGradientSolver(w=w, X=X, xx=G, xy=b, D=D, lr=self.lr, tol=self.tol, maxIter=self.maxIter)
-                w = logisticRegressionGradientSolver(w=w, X=X, y=y, D=D, lr=self.lr, tol=self.tol, maxIter=self.maxIter)
+                w = logisticRegressionGradientSolver(w=w, X=X, y=y, D=D, lr=self.lr, tol=self.tol, maxIter=self.maxIter, quiet=True)
                 if w is None:
                     self.w = np.zeros(p)
                     return None
@@ -144,15 +143,3 @@ class PrecisionLasso():
             self.gamma = 0.5
         else:
             self.gamma = (float(correlation)/(correlation+linearDepend))
-
-if __name__ == '__main__':
-    np.random.seed(1)
-    X = np.random.random([100, 1000])
-    y = np.random.random([100])
-    model = PrecisionLasso()
-    model.setLogisticFlag(False)
-    model.setLambda(1)
-    model.calculateGamma(X)
-    model.setLearningRate(1e-6)
-    model.fit(X, y)
-    beta = model.getBeta()
