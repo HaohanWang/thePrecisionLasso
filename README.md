@@ -37,5 +37,11 @@ You can also clone the repository and do a manual install.
    python setup.py install
 ```
 
+## Software with GUI
+Software with GUI will be avaliable through [GenAMap](http://genamap.org/)
+
+## Python Users
+Proficient python users can directly call the Precision Lasso with python code, see the example [here](https://github.com/HaohanWang/thePrecisionLasso/blob/master/BasicExample.ipynb)
+
 ## Contact
 [Haohan Wang](http://www.cs.cmu.edu/~haohanw/)
