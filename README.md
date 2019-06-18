@@ -8,7 +8,7 @@ Implementation of the Precision Lasso in this paper:
 
 The Precision Lasso is a Lasso variant that is showed to work better compared to other Lasso variants in terms of variable selection when there are correlated and linearly dependent variables existing.
 
-This repository serves for the purpose to guide others to use our tool, if you are interested in the scripts to replicate our results, please contact us ([haohanw@cs.cmu.edu](mailto:haohanw@cs.cmu.edu)) and we will share the repository for replication. 
+This repository serves for the purpose to guide others to use our tool, if you are interested in the scripts to replicate our results, please contact us and we will share the repository for replication. 
 
 ## File Structure:
 
