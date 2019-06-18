@@ -47,4 +47,5 @@ Proficient python users can directly call the Precision Lasso with python code, 
 
 ## Contact
 [Haohan Wang](http://www.cs.cmu.edu/~haohanw/)
+
 [@HaohanWang](https://twitter.com/HaohanWang)
