@@ -2,13 +2,15 @@
 
 Implementation of the Precision Lasso in this paper:
 
-    ''Wang H, Lengerich BJ, Aragam B, Xing EP. Precision Lasso: Accounting for Correlations and Linear Dependencies in High-Dimensional Genomic Data. Bioinformatics. 2018''
+   Precision Lasso: Accounting for Correlations and Linear Dependencies in High-Dimensional Genomic Data.  
+   Wang H, Lengerich BJ, Aragam B, Xing EP.  
+   Bioinformatics. 2018  
 
 ## Introduction
 
 The Precision Lasso is a Lasso variant that is showed to work better compared to other Lasso variants in terms of variable selection when there are correlated and linearly dependent variables existing.
 
-**Replication:** This repository serves for the purpose to guide others to use our tool, if you are interested in the scripts to replicate our results, please contact us and we will share the repository for replication. 
+**Replication:** This repository serves for the purpose to guide others to use our tool, if you are interested in the scripts to replicate our results, please contact us and we will share the repository for replication. Contact information is at the bottom of this page. 
 
 ## File Structure:
 
