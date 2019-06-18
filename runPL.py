@@ -121,7 +121,7 @@ elif options.lmbd is None:
     while min_lambda < max_lambda and iteration < patience:
         iteration += 1
         lmbd = np.exp((np.log(min_lambda) + np.log(max_lambda)) / 2.0)
-        print "Iter:{}\tlambda:{}".format(iteration, lmbd)
+        print ("Iter:{}\tlambda:{}".format(iteration, lmbd))
         model.setLambda(lmbd)
         if implementation == 1:
             model.setLearningRate(options.lr)  # learning rate must be set again every time we run it.
@@ -129,7 +129,7 @@ elif options.lmbd is None:
         beta = model.getBeta()
 
         c = len(np.where(np.abs(beta) > 0)[0])  # we choose regularizers based on the number of non-zeros it reports
-        print "# Chosen:{}".format(c)
+        print ("# Chosen:{}".format(c))
         if c < snum:  # Regularizer too strong
             max_lambda = lmbd
         elif c > snum:  # Regularizer too weak

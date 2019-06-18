@@ -36,6 +36,7 @@ class PrecisionLasso():
         cf = 0
         for it in range(self.maxIter):
             self.mu = muList[it]
+            self.mu = self.lmbd
             w = np.nan_to_num(w)
             w[np.abs(w)<self.mu] = self.mu
             W = P * np.tile(w, (P.shape[0], 1))
