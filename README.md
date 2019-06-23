@@ -1,4 +1,6 @@
-# the Precision Lasso
+![Precision](pl.PNG "Precision Lasso")
+
+# Precision Lasso
 
 Implementation of the Precision Lasso in this paper:
 
