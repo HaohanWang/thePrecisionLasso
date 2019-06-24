@@ -4,9 +4,7 @@
 
 Implementation of the Precision Lasso in this paper:
 
-   Precision Lasso: Accounting for Correlations and Linear Dependencies in High-Dimensional Genomic Data.  
-   Wang H, Lengerich BJ, Aragam B, Xing EP.  
-   Bioinformatics. 2018  
+   Haohan Wang, Benjamin J Lengerich, Bryon Aragam, Eric P Xing, Precision Lasso: accounting for correlations and linear dependencies in high-dimensional genomic data, Bioinformatics, Volume 35, Issue 7, 01 April 2019, Pages 1181–1187, https://doi.org/10.1093/bioinformatics/bty750
 
 ## Introduction
 
@@ -29,7 +27,7 @@ python runPL.py -t csv -n data/toy
 * Precision Lasso currently supports CSV and binary PLINK files. 
 * Extensions to other data format can be easily implemented through `FileReader` in `utility/dataLoadear`. Feel free to contact us for the support of other data format. 
 
-## Installation
+## Installation (Not Required)
 You will need to have numpy and scipy installed on your current system.
 You can install precision lasso using pip by doing the following
 
@@ -43,13 +41,10 @@ You can also clone the repository and do a manual install.
    python setup.py install
 ```
 
-## Software with GUI
-Software with GUI will be avaliable through [GenAMap](http://genamap.org/)
-
 ## Python Users
 Proficient python users can directly call the Precision Lasso with python code, see the example [here](https://github.com/HaohanWang/thePrecisionLasso/blob/master/BasicExample.ipynb)
 
 ## Contact
 [Haohan Wang](http://www.cs.cmu.edu/~haohanw/)
-
+&middot;
 [@HaohanWang](https://twitter.com/HaohanWang)
